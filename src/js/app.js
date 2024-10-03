@@ -33,10 +33,14 @@ function render(variables = {}) {
   document.querySelector("#widget_content").innerHTML = `<div class="widget">
             ${cover}
           <img src="${variables.avatarURL}" class="photo" />
-          <h1>Lucy Boilett</h1>
-          <h2>Web Developer</h2>
-          <h3>Miami, USA</h3>
-          <ul class="position-right">
+          <h1>${variables.name ? variables.name : "Lucy"}${
+    variables.lastName ? variables.lastName : " Boilet"
+  }</h1>
+          <h2>${variables.role ? variables.role : "Web Developer"}</h2>
+          <h3>${variables.country ? variables.country : "Miami "}${
+    variables.city ? variables.city : " USA"
+  }</h3>          
+            <ul class="position-right">
             <li><a href="https://twitter.com/4geeksacademy"><i class="fab fa-twitter"></i></a></li>
             <li><a href="https://github.com/4geeksacademy"><i class="fab fa-github"></i></a></li>
             <li><a href="https://linkedin.com/school/4geeksacademy"><i class="fab fa-linkedin"></i></a></li>
@@ -44,6 +48,9 @@ function render(variables = {}) {
           </ul>
         </div>
     `;
+  document.querySelector(
+    "#widget_content"
+  ).style = `background-color: ${variables.backgroundColor}`;
 }
 
 /**
@@ -68,7 +75,8 @@ window.onload = function() {
     lastName: null,
     role: null,
     country: null,
-    city: null
+    city: null,
+    backgroundColor: null
   };
   render(window.variables); // render the card for the first time
 
