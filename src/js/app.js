@@ -24,49 +24,95 @@ import "../style/index.css";
  */
 function render(variables = {}) {
   console.log("These are the current variables: ", variables); // print on the console
-  // here we ask the logical questions to make decisions on how to build the html
-  // if includeCover==false then we reset the cover code without the <img> tag to make the cover transparent.
+
+  // Condición para incluir o no la imagen de fondo
   let cover = `<div class="cover"><img src="${variables.background}" /></div>`;
   if (variables.includeCover == false) cover = "<div class='cover'></div>";
 
-  // reset the website body with the new html output
-  document.querySelector("#widget_content").innerHTML = `<div class="widget">
-            ${cover}
+  // Determinamos la clase para la posición de la barra de redes sociales
+  const socialMediaClass =
+    variables.socialMediaPosition === "position-left"
+      ? "position-left"
+      : "position-right";
+
+  // Reseteamos el contenido de la tarjeta
+  document.querySelector("#widget_content").innerHTML = `
+        <div class="widget">
+          ${cover}
           <img src="${variables.avatarURL}" class="photo" />
           <h1>${variables.name ? variables.name : "Lucy"}${
     variables.lastName ? variables.lastName : " Boilet"
   }</h1>
           <h2>${variables.role ? variables.role : "Web Developer"}</h2>
-          <h3>${variables.country ? variables.country : "Miami "}${
-    variables.city ? variables.city : " USA"
+          <h3>${variables.country ? variables.country : "Miami"} ${
+    variables.city ? variables.city : "USA"
   }</h3>          
-            <ul class="position-right">
-            <li><a href="https://twitter.com/4geeksacademy"><i class="fab fa-twitter"></i></a></li>
-            <li><a href="https://github.com/4geeksacademy"><i class="fab fa-github"></i></a></li>
-            <li><a href="https://linkedin.com/school/4geeksacademy"><i class="fab fa-linkedin"></i></a></li>
-            <li><a href="https://instagram.com/4geeksacademy"><i class="fab fa-instagram"></i></a></li>
+          <ul class="${socialMediaClass}">
+            ${
+              variables.twitter
+                ? `<li><a href="${variables.twitter}" target="_blank"><i class="fab fa-twitter"></i></a></li>`
+                : ""
+            }
+            ${
+              variables.github
+                ? `<li><a href="${variables.github}" target="_blank"><i class="fab fa-github"></i></a></li>`
+                : ""
+            }
+            ${
+              variables.linkedin
+                ? `<li><a href="${variables.linkedin}" target="_blank"><i class="fab fa-linkedin"></i></a></li>`
+                : ""
+            }
+            ${
+              variables.instagram
+                ? `<li><a href="${variables.instagram}" target="_blank"><i class="fab fa-instagram"></i></a></li>`
+                : ""
+            }
           </ul>
         </div>
-    `;
+      `;
+
+  // Establecemos el color de fondo
   document.querySelector(
     "#widget_content"
   ).style = `background-color: ${variables.backgroundColor}`;
+
+  // Añadimos eventos de click en los labels para abrir el enlace en una nueva pestaña
+  addLabelClickEvents();
 }
 
-/**
- * Don't change any of the lines below, here is where we do the logic for the dropdowns
- */
+function addLabelClickEvents() {
+  const socialMediaLinks = {
+    twitter: "twitter",
+    github: "github",
+    linkedin: "linkedin",
+    instagram: "instagram"
+  };
+
+  Object.keys(socialMediaLinks).forEach(key => {
+    const label = document.querySelector(`label[for="${key}"]`);
+    const input = document.querySelector(`input[for="${key}"]`);
+
+    if (label && input) {
+      label.addEventListener("click", () => {
+        const url = input.value.trim();
+        if (url) {
+          // Abre la URL en una nueva pestaña
+          window.open(url, "_blank");
+        } else {
+          alert(`Por favor, ingresa una URL válida en el campo de ${key}.`);
+        }
+      });
+    }
+  });
+}
+
 window.onload = function() {
   window.variables = {
-    // if includeCover is true the algorithm should show the cover image
     includeCover: true,
-    // this is the image's url that will be used as a background for the profile cover
     background: "https://images.unsplash.com/photo-1511974035430-5de47d3b95da",
-    // this is the url for the profile avatar
     avatarURL: "https://randomuser.me/api/portraits/women/42.jpg",
-    // social media bar position (left or right)
     socialMediaPosition: "position-left",
-    // social media usernames
     twitter: null,
     github: null,
     linkedin: null,
@@ -78,12 +124,11 @@ window.onload = function() {
     city: null,
     backgroundColor: null
   };
-  render(window.variables); // render the card for the first time
+  render(window.variables);
 
   document.querySelectorAll(".picker").forEach(function(elm) {
     elm.addEventListener("change", function(e) {
-      // <- add a listener to every input
-      const attribute = e.target.getAttribute("for"); // when any input changes, collect the value
+      const attribute = e.target.getAttribute("for");
       let values = {};
       values[attribute] =
         this.value == "" || this.value == "null"
@@ -93,7 +138,7 @@ window.onload = function() {
           : this.value == "false"
           ? false
           : this.value;
-      render(Object.assign(window.variables, values)); // render again the card with new values
+      render(Object.assign(window.variables, values));
     });
   });
 };
